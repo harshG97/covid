@@ -26,7 +26,7 @@ SECRET_KEY = '&^2ih8wqo-eh(&g@2w)=7%6j-j359=fv9)a4y2ah!gx!=#zj&d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['covidvisuals.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -138,4 +138,4 @@ DATABASES['default'].update(db_from_env)
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['covidvisuals.herokuapp.com', '127.0.0.1']
+#ALLOWED_HOSTS = ['covidvisuals.herokuapp.com', '127.0.0.1']
