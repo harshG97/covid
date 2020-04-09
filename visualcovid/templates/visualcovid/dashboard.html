@@ -1,0 +1,452 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COVID-19 Dashboard</title>
+
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!--JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!--Choice.js-->
+    <link rel="stylesheet" href="{% static 'css/choicejs.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <!--Charts-->
+    <script src="//www.amcharts.com/lib/4/core.js"></script>
+    <script src="//www.amcharts.com/lib/4/charts.js"></script>
+    <script src="//www.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="//www.amcharts.com/lib/4/themes/material.js"></script>
+    <script src="//www.amcharts.com/lib/4/themes/kelly.js"></script>
+
+    <!--Table-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+
+    <!--Loading overlay-->
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    
+  </head>
+
+  <body>
+    
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-12 col-xl-12 mr-0" href="#">COVID-19</a>
+      <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row ">
+        <nav class="col-md-2 col-xl-1 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+              </li>
+            </ul>
+
+            
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-10 ml-sm-auto col-lg-10 col-xl-11 pt-3 px-4">
+              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                          <div class="btn-group mr-2">
+                                
+                                <button class="btn btn-sm btn-outline-secondary" id = "downloadPng">Export as PNG</button>
+                          </div>
+                    </div>
+              </div>
+              <div class="container">
+                    <div class="row align-items-center">
+                          <div class ="col-12 col-sm-12 col-xl-9">
+                          
+                                <!-- <form> -->
+                                <div class="form-row align-items-center">
+                                      <div class="col-12 col-sm-12 col-xl-6 my-1">
+                                        <select class="custom-select mr-sm-2" id="countrySelect"  placeholder="Select countries..." multiple>
+                                          <option value="">Select countries...</option>
+                                          <!-- <option value ="top10" selected>Top 10</option> -->
+                                        </select>
+                                      </div>
+                            
+                                      <div class="col-12 col-sm-12 col-xl-3 my-1">
+                                        <select class="custom-select mr-sm-2" id="timeselect">
+                                          <option value = "5" selected>Last 5 days</option>
+                                          <option value="10">Last 10 days</option>
+                                          <option value="15">Last 15 days</option>
+                                          <option value="20">Last 20 days</option>
+                                          <option value="30">Last 30 days</option>
+                                          <option value="40">Last 40 days</option>
+                                          <option value="-1">All time</option>
+                                        </select>
+                                      </div>
+
+                                      <div class="col-12 col-sm-12 col-xl-3 my-1">
+                                        <select class="custom-select mr-sm-2" id="typeselect">
+                                          <option value = "confirmed" selected>Confirmed cases</option>
+                                          <option value="active">Active cases</option>
+                                          <option value="deaths">Deaths</option>
+                                          <option value="newconfirmed">New cases per day</option>
+                                          <option value="growthfactor">Growth Factor</option>
+                                        </select>
+                                      </div>
+                                </div>
+                                <!-- </form> -->
+                              
+                          </div>
+                          <div class="col-12 col-sm-12 col-xl-3 float-right my-1">
+                                <div class="float-right">
+                                      <button type="submit" class="btn btn-primary  " id="plotBtn">Plot</button>
+                                </div>
+                          </div>
+                    </div>
+              </div>
+            
+              <br>
+
+              <div class="my-4" id="myChart" style=" width : 100%; height: 70vh;" ></div>
+              <script>
+                chartResize = async function(){
+                  await new Promise(r => setTimeout(r, 50));
+                  var w=$(window).width();
+                  var h=$(window).height();
+
+                  console.log("width", w);
+                  console.log("height", h);
+                 
+                  if(h<600){
+                    // $("#myChart").css('width', a);
+                    $("#myChart").css('height', "150vh");
+                  }
+                  else{
+                    $("#myChart").css('height', "70vh");
+                  }
+                  
+                }
+                chartResize();
+                window.addEventListener("orientationchange", chartResize);
+              </script>
+
+
+              <br>
+              
+              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Raw Data</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                      <div class="btn-group mr-2">
+                            <button class="btn btn-sm btn-outline-secondary" id="download">Export as CSV</button>
+                            
+                      </div>
+                </div>
+              </div>
+
+              <br>
+
+              <!--TABLE-->
+              <div class ="mb-2"id = "rawData"></div>
+
+              <footer class="pt-4 my-md-5 pt-md-5 border-top ">
+                <div class="row">
+                  
+                  <!-- <div class="col-6 col-md-4">
+                    <h5 style="text-align: center;">Features</h5>
+                    <ul class="list-unstyled text-small">
+                      <li style="text-align: center;"><a class="text-muted" href="#">Cool stuff</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Random feature</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Team feature</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Stuff for developers</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Another one</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Last time</a></li>
+                    </ul>
+                  </div> -->
+                  <div class="col-12 col-md-12">
+                    <h6 style="text-align: center;">Developed by Harsh Gupta</h6>
+                  </div>
+                </div>
+                  <div class="row ">
+                    <div class="col-4"></div>
+                    <div class="col-4" style="text-align: center;">
+                    <a href="https://www.linkedin.com/in/harsh-gupta-a8a7303a/" target="_blank"><span  data-feather="linkedin"></span></a>
+                    <span class="mx-2"></span>
+                    <a href="https://www.facebook.com/harsh1897" target="_blank"><span data-feather="facebook"></span></a>
+                    <span class="mx-2"></span>
+                    <a href="https://github.com/harshG97" target="_blank"><span data-feather="github"></span></a>
+                  </div>
+                  <div class="col-4"></div>
+
+                  </div> 
+                  <!-- <div class="col-6 col-md-4">
+                    <h5 style="text-align: center;">About</h5>
+                    <ul class="list-unstyled text-small">
+                      <li style="text-align: center;"><a class="text-muted" href="#">Team</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Locations</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Privacy</a></li>
+                      <li style="text-align: center;"><a class="text-muted" href="#">Terms</a></li>
+                    </ul>
+                  </div> -->
+                
+              </footer>
+
+              
+
+              <script>
+                
+                var multipleCancelButton;
+                multipleCancelButton = new Choices('#countrySelect', {
+                  removeItemButton: true,
+                  itemSelectText: '',
+                });
+                var countriesReq =['top10'];
+                var time = document.getElementById("timeselect").value;
+                var plotType = document.getElementById("typeselect").value;
+
+                /////////// GET UPDATED LIST OF ALL COUNTRIES ///////////
+                $.getJSON('{% url "countries" %}', function(result){
+                  multipleCancelButton.destroy();
+                  console.log("resp", result);
+                  var allCountries = result["countries"];
+                  console.log(allCountries);
+
+                  var countrySelectList = document.getElementById("countrySelect");
+                  for(var i =0; i<allCountries.length;++i){
+                    var option = document.createElement("option");
+                    option.value = allCountries[i];
+                    option.text = allCountries[i];
+                    countrySelectList.appendChild(option);
+                  }
+                  var option = document.createElement("option");
+                  option.value = "top10";
+                  option.text = "Top 10";
+                  option.selected = true;
+                  countrySelectList.appendChild(option);
+                  
+                  var option = document.createElement("option");
+                  option.value = "all";
+                  option.text = "All";
+                  countrySelectList.appendChild(option);
+
+                  multipleCancelButton = new Choices('#countrySelect', {
+                  removeItemButton: true,
+                  itemSelectText: '',
+                  });
+                  multipleCancelButton.passedElement.element.addEventListener(
+                    'addItem',
+                    function(event) {
+                      countriesReq.push(event.detail.value);
+                    },
+                    false,
+                  );
+
+                  multipleCancelButton.passedElement.element.addEventListener(
+                    'removeItem',
+                    function(event) {
+                      countriesReq.splice(countriesReq.indexOf(event.detail.value), 1);
+                    },
+                    false,
+                  );
+                
+                });
+                /////////////////////////////
+
+
+                var timeselect = new Choices('#timeselect', {
+                  removeItemButton: false,
+                  itemSelectText: '',
+                  searchEnabled: false,
+                });
+
+                timeselect.passedElement.element.addEventListener(
+                  'addItem',
+                  function(event) {
+                    time = event.detail.value;
+                  },
+                  false,
+                );
+
+                var typeselect = new Choices('#typeselect', {
+                  removeItemButton: false,
+                  itemSelectText: '',
+                  searchEnabled: false,
+                });
+
+                typeselect.passedElement.element.addEventListener(
+                  'addItem',
+                  function(event) {
+                    plotType = event.detail.value;
+                  },
+                  false,
+                );
+                
+                /////////// PLOT BTN ON CLICK ///////////
+                var plotBtnClick = function(){
+                  $('#myChart').LoadingOverlay("show", {
+                    size : 25,
+                    minSize : 0,
+                    maxSize : 25
+                  });
+                  $.getJSON('{% url "data" %}',{'country' : JSON.stringify(countriesReq), 'time' : time, 'plotType' : plotType}, function(result){
+          
+                    var resultJson = JSON.parse(result);
+                    var datasetsList2 = [];
+                    var chartCategories = [];
+                    var tableHeaders =[];
+                    var countriesResp = [];
+                    console.log(resultJson["data"]);
+                    for(var i = 0; i<resultJson["data"].length; ++i){
+                      var country;
+                      var countryDataset = [];
+                      var object = resultJson["data"][i];
+
+                      for(key in object){
+                        if(object.hasOwnProperty(key)){
+                            if(key == "Country/Region"){
+                              country = object[key];
+                              countriesResp.push(country);
+                              if(i==0){
+                                tableHeaders.push(key);
+                              }
+                            }
+                            else{
+                              var dataObj = {};
+                              var date = key.split("/");
+                              dataObj["date"] = new Date("20"+date[2], date[0]-1, date[1]);
+                              dataObj["value"] = object[key];
+                              countryDataset.push(dataObj);
+
+                              if(i==0){
+                                tableHeaders.push(key);
+                              }
+                            }
+                        }
+                      }
+                        datasetsList2.push(countryDataset);
+                    }
+                    
+                    $('#myChart').LoadingOverlay("hide", force = true);
+                    /////////// CHART ///////////
+                    am4core.useTheme(am4themes_animated);
+                    am4core.useTheme(am4themes_kelly);
+                    var chart = am4core.create("myChart", am4charts.XYChart);
+                  
+                    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                    dateAxis.renderer.grid.template.location = 0;
+                    dateAxis.renderer.minGridDistance = 45;
+                    // dateAxis.startLocation = 0.5;
+                    //   dateAxis.endLocation = 0.5;
+                    dateAxis.renderer.minLabelPosition = 0.01;
+                    dateAxis.renderer.maxLabelPosition = 0.99;
+                    dateAxis.renderer.labels.template.rotation = 315;
+                    dateAxis.renderer.labels.template.horizontalCenter = "middle";
+                    dateAxis.renderer.labels.template.verticalCenter = "middle";
+                    
+                    var  valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    // valueAxis.title.text = "Cases";
+                    
+                    for(var i =0; i<countriesResp.length; ++i){
+                      var series = chart.series.push(new am4charts.LineSeries());
+                      series.dataFields.valueY = "value";
+                      series.dataFields.dateX = "date";
+                      series.name = countriesResp[i];
+                      series.tooltipText = "{name}: [bold]{valueY}[/]";
+                      series.strokeWidth = 3;
+                      series.minBulletDistance = 20;
+                      var bullet = series.bullets.push(new am4charts.CircleBullet());
+                      // bullet.circle.strokeWidth = 2;
+                      bullet.circle.radius = 4;
+                      
+                      series.data = datasetsList2[i];
+                    }
+                
+                    chart.cursor = new am4charts.XYCursor();
+                    if (countriesResp.length < 20){
+                        chart.legend = new am4charts.Legend();
+                    }
+                    chart.exporting.menu = new am4core.ExportMenu();
+                    $("#downloadPng").click(function exportPNG() {
+                        chart.exporting.filePrefix = "corona_"+plotType+"_"+time;
+                        chart.exporting.export("png");
+                    });
+                    /////////////////////////////
+
+
+                    /////////// TABLE ///////////
+                    var dataObject = resultJson["data"];
+                    var tableElement = document.getElementById("rawData");
+                    var tableElementContainer = tableElement.parentNode;
+                    var hotSettings = {
+                      data: dataObject,
+                      licenseKey: 'non-commercial-and-evaluation',
+                      stretchH: 'all',
+                      width: '100%',
+                      autoWrapRow: true,
+                      height: '50vh',
+                      maxRows: 20,
+                      rowHeaders: true,
+                      colHeaders: tableHeaders,
+                      columnSorting: {
+                        indicator: true
+                      },
+                      autoColumnSize: {
+                        samplingRatio: 23
+                      },
+                      exportFile: true
+                    };
+                    var hot = new Handsontable(tableElement, hotSettings);
+                    var downloadBtn = document.getElementById('download');
+                    var exportPlugin1 = hot.getPlugin('exportFile');
+
+                    
+                    downloadBtn.addEventListener('click', function() {
+                      exportPlugin1.downloadFile('csv', {
+                        bom: false,
+                        columnDelimiter: ',',
+                        columnHeaders: true,
+                        exportHiddenColumns: true,
+                        exportHiddenRows: true,
+                        fileExtension: 'csv',
+                        filename: "corona_"+plotType+"_"+time,
+                        mimeType: 'text/csv',
+                        rowDelimiter: '\r\n',
+                        rowHeaders: true
+                      });
+                    });
+
+                    /////////////////////////////
+                  
+                  });
+                
+                }
+                /////////////////////////////
+
+                /////////// For ploting default chart ///////////
+                plotBtnClick();
+                
+                $("#plotBtn").click(plotBtnClick);
+
+              </script>
+
+        </main>
+      </div>
+    </div>
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+  </body>
+</html>
