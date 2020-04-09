@@ -22,12 +22,11 @@ def getCountries(request):
     return JsonResponse({"countries" : countries_forJson})
 
 def data(request):
-    print(request.headers.get('Content-Type'))
     countries = json.loads(request.GET['country'])
-    print("countries", countries)
+    
     time = json.loads(request.GET['time'])
     plotType = request.GET["plotType"]
-    print(time, plotType)
+    
     if plotType == 'confirmed':
         response = confirmed(countries, time)
     elif plotType == 'deaths':
@@ -57,7 +56,6 @@ def confirmed(countries, time):
             
             
     group_t = group.transpose()
-    print("countries2", countries)
 
     if(time == -1):
         group_tt = group_t[countries].transpose()
@@ -83,7 +81,6 @@ def deaths(countries, time):
         countries = top10
 
     group_t = group.transpose()
-    print("countries2", countries)
 
     if(time == -1):
         group_tt = group_t[countries].transpose()
@@ -122,7 +119,6 @@ def active(countries, time):
 
     if(time == -1):
         active_tt = active_t[countries].transpose()
-        #groupDiff_tt = groupDiff_tt.drop(["Lat", "Long"], axis = 1)
     else:
         active_tt = active_t[countries][-1*time:].transpose()
 
@@ -134,26 +130,25 @@ def newConfirmed(countries, time):
     print("new")
     data = pd.read_csv("https://data.humdata.org/hxlproxy/api/data-preview.csv?url=https%3A%2F%2Fraw.githubusercontent.com%2FCSSEGISandData%2FCOVID-19%2Fmaster%2Fcsse_covid_19_data%2Fcsse_covid_19_time_series%2Ftime_series_covid19_confirmed_global.csv&filename=time_series_covid19_confirmed_global.csv")
     group = data.groupby(['Country/Region']).sum()
-
-    if 'all' in countries:
-        group = group.sort_values(by= group.columns[-1], ascending = False)
-        countries = list(group.index)
-    elif 'top10' in countries:
-        countries.remove('top10')
-        group = group.sort_values(by= group.columns[-1], ascending = False)
-        top10 = list(group.index[:10])
-        top10.extend(x for x in countries if x not in top10)
-        countries = top10
-
     group = group.drop(["Lat", "Long"], axis = 1)
     groupDiff = pd.DataFrame(data=group, copy=True)
+
     prev = group.columns[0]
     for col in group.columns:
         groupDiff[col]=group[col]-group[prev]
         prev = col
-        
+
+    if 'all' in countries:
+        groupDiff = groupDiff.sort_values(by= groupDiff.columns[-1], ascending = False)
+        countries = list(groupDiff.index)
+    elif 'top10' in countries:
+        countries.remove('top10')
+        groupDiff = groupDiff.sort_values(by= groupDiff.columns[-1], ascending = False)
+        top10 = list(groupDiff.index[:10])
+        top10.extend(x for x in countries if x not in top10)
+        countries = top10
+
     groupDiff_t = groupDiff.transpose()
-    print("countries2", countries)
 
     if(time == -1):
         groupDiff_tt = groupDiff_t[countries].transpose()
@@ -165,27 +160,25 @@ def newConfirmed(countries, time):
     return response
 
 def growthFactor(countries, time):
-    print("new")
     data = pd.read_csv("https://data.humdata.org/hxlproxy/api/data-preview.csv?url=https%3A%2F%2Fraw.githubusercontent.com%2FCSSEGISandData%2FCOVID-19%2Fmaster%2Fcsse_covid_19_data%2Fcsse_covid_19_time_series%2Ftime_series_covid19_confirmed_global.csv&filename=time_series_covid19_confirmed_global.csv")
     group = data.groupby(['Country/Region']).sum()
-
-    if 'all' in countries:
-        group = group.sort_values(by= group.columns[-1], ascending = False)
-        countries = list(group.index)
-    elif 'top10' in countries:
-        countries.remove('top10')
-        group = group.sort_values(by= group.columns[-1], ascending = False)
-        top10 = list(group.index[:10])
-        top10.extend(x for x in countries if x not in top10)
-        countries = top10
-
     group = group.drop(["Lat", "Long"], axis = 1)
     groupDiff = pd.DataFrame(data=group, copy=True)
-    
+
     prev = group.columns[0]
     for col in group.columns:
         groupDiff[col]=group[col]-group[prev]
         prev = col
+
+    if 'all' in countries:
+        groupDiff = groupDiff.sort_values(by= groupDiff.columns[-1], ascending = False)
+        countries = list(groupDiff.index)
+    elif 'top10' in countries:
+        countries.remove('top10')
+        groupDiff = groupDiff.sort_values(by= groupDiff.columns[-1], ascending = False)
+        top10 = list(groupDiff.index[:10])
+        top10.extend(x for x in countries if x not in top10)
+        countries = top10
         
     groupDiffDiv = pd.DataFrame(data=groupDiff, copy=True)
     prev = groupDiff.columns[0]
@@ -194,11 +187,9 @@ def growthFactor(countries, time):
         prev = col
         
     groupDiffDiv_t = groupDiffDiv.transpose()
-    print("countries2", countries)
 
     if(time == -1):
         groupDiffDiv_tt = groupDiffDiv_t[countries].transpose()
-        #groupDiff_tt = groupDiff_tt.drop(["Lat", "Long"], axis = 1)
     else:
         groupDiffDiv_tt = groupDiffDiv_t[countries][-1*time:].transpose()
     response = groupDiffDiv_tt.to_json(orient='table')
