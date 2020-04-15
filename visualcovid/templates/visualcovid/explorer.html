@@ -36,6 +36,29 @@
 
     <!-- Stylesheet -->
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
+
+    <script>
+        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
+            var allDataConfirmed = JSON.parse(result);
+            console.log("conf",allDataConfirmed);
+        });
+
+        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
+            var allDataDeath = JSON.parse(result);
+            console.log("death", allDataDeath);
+        });
+        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
+            var allDataActive = JSON.parse(result);
+            console.log("active", allDataActive);
+        });
+        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
+            var allDataNew = JSON.parse(result);
+            console.log("new",allDataNew);
+        });
+        
+
+        
+    </script>
     
   </head>
 
@@ -52,15 +75,9 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href=''>
+                <a class="nav-link active" href='{% url "index" %}'>
                   <span data-feather="home"></span>
-                  Dashboard <span class="sr-only">(current)</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href='{% url "explorer" %}'>
-                  <span data-feather="home"></span>
-                  Explorer 
+                  Dashboard
                 </a>
               </li>
             </ul>
@@ -71,7 +88,7 @@
 
         <main role="main" class="col-md-10 ml-sm-auto col-lg-10 col-xl-11 pt-3 px-4">
               <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard</h1>
+                    <h1 class="h2">Explorer</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                           <div class="btn-group mr-2">
                                 
@@ -120,16 +137,18 @@
                           <div class="col-12 col-sm-12 col-xl-3 float-right my-1">
                                 <div class="float-right">
                                       <button type="submit" class="btn btn-primary  " id="plotBtn">Plot</button>
+                                      <button type="submit" class="btn btn-primary  " id="showbtn">show</button>
                                 </div>
                           </div>
                     </div>
               </div>
             
               <br>
-
-              <div class="my-4" id="myChart" style=" width : 100%; height: 70vh;" ></div>
+              <div class="container" id = "chartcntnr" style=" width : 100%; height: 70vh;">
+              <!-- <div class="my-4" id="myChart" style=" width : 100%; height: 70vh;" ></div> -->
+            </div>
               <script>
-                chartResize = async function(){
+                var chartResize = async function(){
                   await new Promise(r => setTimeout(r, 50));
                   var w=$(window).width();
                   var h=$(window).height();
@@ -139,13 +158,13 @@
                  
                   if(h<600){
                     // $("#myChart").css('width', a);
-                    $("#myChart").css('height', "150vh");
+                    $("#chartcntnr").css('height', "150vh");
                   }
                   else{
-                    $("#myChart").css('height', "70vh");
+                    $("#chartcntnr").css('height', "70vh");
                   }
                   
-                }
+                };
                 chartResize();
                 window.addEventListener("orientationchange", chartResize);
               </script>
@@ -303,8 +322,10 @@
                 );
                 
                 /////////// PLOT BTN ON CLICK ///////////
+                var chartList =[];
+                var id = 1;
                 var plotBtnClick = function(){
-                  $('#myChart').LoadingOverlay("show", {
+                  $('#chartcntnr').LoadingOverlay("show", {
                     size : 25,
                     minSize : 0,
                     maxSize : 25
@@ -347,11 +368,20 @@
                         datasetsList2.push(countryDataset);
                     }
                     
-                    $('#myChart').LoadingOverlay("hide", force = true);
+                    // $('#chartcntnr').LoadingOverlay("hide", force = true);
                     /////////// CHART ///////////
                     //am4core.useTheme(am4themes_animated);
-                    am4core.useTheme(am4themes_kelly);
-                    var chart = am4core.create("myChart", am4charts.XYChart);
+                    var chartcontainer = document.getElementById("chartcntnr");
+                    var chartelement = document.createElement("div");
+                    chartelement.id = String(1);
+                    chartelement.style.height="100%";
+                    chartelement.style.width = "100%";
+                    id++;
+                    
+                    
+                    //am4core.useTheme(am4themes_kelly);
+                    
+                    var chart = am4core.create(chartelement, am4charts.XYChart);
                   
                     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
                     dateAxis.renderer.grid.template.location = 0;
@@ -365,6 +395,8 @@
                     dateAxis.renderer.labels.template.verticalCenter = "middle";
                     
                     var  valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    valueAxis.min =0;
+                    valueAxis.max = 700000;
                     // valueAxis.title.text = "Cases";
                     
                     for(var i =0; i<countriesResp.length; ++i){
@@ -383,14 +415,93 @@
                     }
                 
                     chart.cursor = new am4charts.XYCursor();
-                    if (countriesResp.length < 20){
-                        chart.legend = new am4charts.Legend();
-                    }
+                    // if (countriesResp.length < 20){
+                    //     chart.legend = new am4charts.Legend();
+                    // }
                     chart.exporting.menu = new am4core.ExportMenu();
                     $("#downloadPng").click(function exportPNG() {
                         chart.exporting.filePrefix = "corona_"+plotType+"_"+time;
                         chart.exporting.export("png");
                     });
+                    // chart.disabled = true;
+                    //chart.hide(0);
+                    //chart.setVisibility(false);
+                    ///chartelement.style.display = "none";
+                    chartcontainer.appendChild(chartelement);
+                    chartList.push(chartelement);
+                    chartelement.style.display = "none";
+                    
+
+                    chartelement = document.createElement("div");
+                    chartelement.id = String(2);
+                    chartelement.style.height="100%";
+                    chartelement.style.width = "100%";
+                    // chartelement.style.display = "none";
+                    id++;
+                    
+                    
+                    am4core.useTheme(am4themes_kelly);
+                    
+                    var chart1 = am4core.create(chartelement, am4charts.XYChart);
+                  
+                    var dateAxis = chart1.xAxes.push(new am4charts.DateAxis());
+                    dateAxis.renderer.grid.template.location = 0;
+                    dateAxis.renderer.minGridDistance = 45;
+                    // dateAxis.startLocation = 0.5;
+                    //   dateAxis.endLocation = 0.5;
+                    dateAxis.renderer.minLabelPosition = 0.01;
+                    dateAxis.renderer.maxLabelPosition = 0.99;
+                    dateAxis.renderer.labels.template.rotation = 315;
+                    dateAxis.renderer.labels.template.horizontalCenter = "middle";
+                    dateAxis.renderer.labels.template.verticalCenter = "middle";
+                    
+                    var  valueAxis = chart1.yAxes.push(new am4charts.ValueAxis());
+                    valueAxis.min =0;
+                    valueAxis.max = 700000;
+                    // valueAxis.title.text = "Cases";
+                    
+                    for(var i =0; i<countriesResp.length-2; ++i){
+                      var series = chart1.series.push(new am4charts.LineSeries());
+                      series.dataFields.valueY = "value";
+                      series.dataFields.dateX = "date";
+                      series.name = countriesResp[i];
+                      series.tooltipText = "{name}: [bold]{valueY}[/]";
+                      series.strokeWidth = 3;
+                      series.minBulletDistance = 25;
+                      var bullet = series.bullets.push(new am4charts.CircleBullet());
+                      // bullet.circle.strokeWidth = 2;
+                      bullet.circle.radius = 4;
+                      
+                      series.data = datasetsList2[i];
+                    }
+                
+                    chart1.cursor = new am4charts.XYCursor();
+                    // if (countriesResp.length < 20){
+                    //     chart1.legend = new am4charts.Legend();
+                    // }
+                    chart1.exporting.menu = new am4core.ExportMenu();
+                    $("#downloadPng").click(function exportPNG() {
+                        chart1.exporting.filePrefix = "corona_"+plotType+"_"+time;
+                        chart1.exporting.export("png");
+                    });
+                    //chart1.disabled = true;
+                    //chart1.setVisibility(false);
+                    //chart1.hide();
+                    
+                    chartcontainer.appendChild(chartelement);
+                    chartList.push(chartelement);
+                    $('#chartcntnr').LoadingOverlay("hide", force = true);
+                    // for(var i=0;i<chartList.length;++i){
+                    //     // if(i==n%2){
+                    //     //     chartList[i].style.display = "block";
+                    //     // }
+                    //     // else{
+                    //         chartList[i].style.display = "none";
+                    //     }
+                    
+
+                    //chart1.appear();
+
                     /////////////////////////////
 
 
@@ -447,6 +558,24 @@
                 plotBtnClick();
                 
                 $("#plotBtn").click(plotBtnClick);
+                var n = 1;
+                // $("#showbtn").click(function(){
+                //     console.log("hi", chartList);
+                    
+                //     for(var i=0;i<chartList.length;++i){
+                //         if(i==n%2){
+                //             chartList[i].style.display = "block";
+                //         }
+                //         else{
+                //             chartList[i].style.display = "none";
+                //         }
+                //     }
+                    
+                //     n=n+1;
+                    
+                //     //chart.setVisibility(true);
+                //     //chart.appear();
+                // });
 
               </script>
 
@@ -455,6 +584,7 @@
     </div>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/try.js' %}"></script>
     <script>
       feather.replace()
     </script>
