@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['covidvisuals.herokuapp.com', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_js_reverse',
     'visualcovid.apps.VisualcovidConfig',
     'django.contrib.admin',
     'django.contrib.auth',

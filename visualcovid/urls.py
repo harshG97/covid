@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path(r'^data/$', views.data, name = 'data'),
-    path(r'^countries/$', views.getCountries, name = 'countries'),
+    path('data/', views.data, name = 'data'),
+    path('countries/', views.getCountries, name = 'countries'),
     path('explorer/', views.explorer, name = 'explorer'),
 ]
