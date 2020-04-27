@@ -1,60 +1,60 @@
 console.log(populationIndexed["India"]);
 console.log(medianAgeIndexed["India"]);
-var multipleCancelButton;
-multipleCancelButton = new Choices('#countrySelect', {
-removeItemButton: true,
-itemSelectText: '',
-});
+// var multipleCancelButton;
+// multipleCancelButton = new Choices('#countrySelect', {
+// removeItemButton: true,
+// itemSelectText: '',
+// });
 var countriesReq =['top10'];
 var time = document.getElementById("timeselect").value;
 var plotType = document.getElementById("typeselect").value;
 
 /////////// GET UPDATED LIST OF ALL COUNTRIES ///////////
-$.getJSON(Urls.countries(), function(result){
-multipleCancelButton.destroy();
-console.log("resp", result);
-var allCountries = result["countries"];
-console.log(allCountries);
+// $.getJSON(Urls.countries(), function(result){
+// multipleCancelButton.destroy();
+// console.log("resp", result);
+// var allCountries = result["countries"];
+// console.log(allCountries);
 
-var countrySelectList = document.getElementById("countrySelect");
-for(var i =0; i<allCountries.length;++i){
-var option = document.createElement("option");
-option.value = allCountries[i];
-option.text = allCountries[i];
-countrySelectList.appendChild(option);
-}
-var option = document.createElement("option");
-option.value = "top10";
-option.text = "Top 10";
-option.selected = true;
-countrySelectList.appendChild(option);
+// var countrySelectList = document.getElementById("countrySelect");
+// for(var i =0; i<allCountries.length;++i){
+// var option = document.createElement("option");
+// option.value = allCountries[i];
+// option.text = allCountries[i];
+// countrySelectList.appendChild(option);
+// }
+// var option = document.createElement("option");
+// option.value = "top10";
+// option.text = "Top 10";
+// option.selected = true;
+// countrySelectList.appendChild(option);
 
-var option = document.createElement("option");
-option.value = "all";
-option.text = "All";
-countrySelectList.appendChild(option);
+// var option = document.createElement("option");
+// option.value = "all";
+// option.text = "All";
+// countrySelectList.appendChild(option);
 
-multipleCancelButton = new Choices('#countrySelect', {
-removeItemButton: true,
-itemSelectText: '',
-});
-multipleCancelButton.passedElement.element.addEventListener(
-'addItem',
-function(event) {
-    countriesReq.push(event.detail.value);
-},
-false,
-);
+// multipleCancelButton = new Choices('#countrySelect', {
+// removeItemButton: true,
+// itemSelectText: '',
+// });
+// multipleCancelButton.passedElement.element.addEventListener(
+// 'addItem',
+// function(event) {
+//     countriesReq.push(event.detail.value);
+// },
+// false,
+// );
 
-multipleCancelButton.passedElement.element.addEventListener(
-'removeItem',
-function(event) {
-    countriesReq.splice(countriesReq.indexOf(event.detail.value), 1);
-},
-false,
-);
+// multipleCancelButton.passedElement.element.addEventListener(
+// 'removeItem',
+// function(event) {
+//     countriesReq.splice(countriesReq.indexOf(event.detail.value), 1);
+// },
+// false,
+// );
 
-});
+// });
 /////////////////////////////
 
 

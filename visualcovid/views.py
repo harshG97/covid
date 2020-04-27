@@ -62,11 +62,11 @@ def confirmed(countries, time):
     group_t = group.transpose()
 
     if(time == -1):
-        group_tt = group_t[countries].transpose()
+        group_t = group_t[countries]#.transpose()
         #group_tt = group_tt.drop(["Lat", "Long"], axis = 1)
     else:
-        group_tt = group_t[countries][-1*time:].transpose()
-    response = group_tt.to_json(orient='table')
+        group_t = group_t[countries][-1*time:]#.transpose()
+    response = group_t.to_json(orient='index')
     
     return response
 
@@ -87,11 +87,11 @@ def deaths(countries, time):
     group_t = group.transpose()
 
     if(time == -1):
-        group_tt = group_t[countries].transpose()
+        group_t = group_t[countries]#.transpose()
         #group_tt = group_tt.drop(["Lat", "Long"], axis = 1)
     else:
-        group_tt = group_t[countries][-1*time:].transpose()
-    response = group_tt.to_json(orient='table')
+        group_t = group_t[countries][-1*time:]#.transpose()
+    response = group_t.to_json(orient='index')
     
     return response
 

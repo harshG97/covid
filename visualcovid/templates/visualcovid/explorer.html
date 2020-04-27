@@ -39,21 +39,25 @@
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
 
     <script>
+      var allDataConfirmed;
+      var allDataDeath;
+      var allDataActive;
+      var allDataNew;
         $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
-            var allDataConfirmed = JSON.parse(result);
+            allDataConfirmed = JSON.parse(result);
             console.log("conf",allDataConfirmed);
         });
 
         $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
-            var allDataDeath = JSON.parse(result);
+            allDataDeath = JSON.parse(result);
             console.log("death", allDataDeath);
         });
         $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
-            var allDataActive = JSON.parse(result);
+            allDataActive = JSON.parse(result);
             console.log("active", allDataActive);
         });
         $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
-            var allDataNew = JSON.parse(result);
+            allDataNew = JSON.parse(result);
             console.log("new",allDataNew);
         });
         
@@ -66,7 +70,27 @@
   <body>
     
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-12 col-xl-12 mr-0" href="#">COVID-19</a>
+      <div class = "navbar-brand col-sm-3 col-md-2 col-xl-1 mr-0 p-0 d-none d-sm-block ">
+        <div >
+          <img src="{% static 'images/covid-19-image.png' %}" style="width: 100%; height: 80%;" alt="">
+        </div>
+      </div>
+
+      <div class = "navbar-nav col-12 d-block d-sm-none ">
+        <div class="row ml-2">
+        <div class= "mr-3 p-2">
+          <a class="nav-link " href='{% url "index" %}' >
+          Overview 
+          </a>
+        </div>
+
+        <div class= "mr-3 p-2">
+          <a class="nav-link active" href='{% url "explorer" %}' >
+            Explorer
+          </a>
+        </div>
+      </div>
+      </div>
       <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
     </nav>
 
@@ -74,11 +98,17 @@
       <div class="row ">
         <nav class="col-md-2 col-xl-1 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
-            <ul class="nav flex-column">
+            <ul class="nav flex-column mt-4 mt-lg-5 mt-xl-4">
               <li class="nav-item">
-                <a class="nav-link active" href='{% url "index" %}'>
+                <a class="nav-link" href='{% url "index" %}'>
                   <span data-feather="home"></span>
-                  Dashboard
+                  Overview
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href=''>
+                  <span data-feather="search"></span>
+                  Explorer <span class="sr-only">(current)</span>
                 </a>
               </li>
             </ul>
@@ -97,20 +127,64 @@
                           </div>
                     </div>
               </div>
-              <div class="container">
+              <div class="container col-12">
                     <div class="row align-items-center">
-                          <div class ="col-12 col-sm-12 col-xl-9">
+                          <div class ="col-12 col-sm-12 col-xl-11">
                           
                                 <!-- <form> -->
                                 <div class="form-row align-items-center">
-                                      <div class="col-12 col-sm-12 col-xl-6 my-1">
+                                      <div class="col-12 col-sm-12 col-xl-4 ">
+                                        <div class="p-1">
+                                          Country
+                                        </div>
                                         <select class="custom-select mr-sm-2" id="countrySelect"  placeholder="Select countries..." multiple>
                                           <option value="">Select countries...</option>
                                           <!-- <option value ="top10" selected>Top 10</option> -->
                                         </select>
                                       </div>
+
+                                      <div class="col-12 col-sm-12 col-xl-3 ">
+                                        <div class="p-1">
+                                          Y-axis
+                                        </div>
+                                        <select class="custom-select mr-sm-2" id="yaxis">
+                                          <option value = "Confirmed cases" selected>Confirmed cases</option>
+                                          <option value="Confirmed cases/1000 population">Confirmed cases/1000 population</option>
+                                          <option value="Deaths/1000 population">Deaths/1000 population</option>
+                                          <option value="Median age">Median age</option>
+                                          <option value="Population">population</option>
+                                          
+                                          <option value="Death percentage">Death percentage</option>
+                                          <option value="Active cases">Active cases</option>
+                                          <option value="Deaths">Deaths</option>
+                                          <option value="New cases/day">New cases/day</option>
+                                          <!-- <option value="growthfactor">Growth Factor</option> -->
+                                        </select>
+                                      </div>
+
+                                      <div class="col-12 col-sm-12 col-xl-3">
+                                        <div class="p-1">
+                                          X-axis
+                                        </div>
+                                        <select class="custom-select mr-sm-2" id="xaxis">
+                                          <option value = "Confirmed cases" selected>Confirmed cases</option>
+                                          <option value="Confirmed cases/1000 population">Confirmed cases/1000 population</option>
+                                          <option value="Deaths/1000 population">Deaths/1000 population</option>
+                                          <option value="Median age">Median age</option>
+                                          <option value="population">population</option>
+                                          
+                                          <option value="Death percentage">Death percentage</option>
+                                          <option value="Active cases">Active cases</option>
+                                          <option value="Deaths">Deaths</option>
+                                          <option value="New cases/day">New cases/day</option>
+                                          <!-- <option value="growthfactor">Growth Factor</option> -->
+                                        </select>
+                                      </div>
                             
-                                      <div class="col-12 col-sm-12 col-xl-3 my-1">
+                                      <div class="col-12 col-sm-12 col-xl-2">
+                                        <div class="p-1">
+                                          Time
+                                        </div>
                                         <select class="custom-select mr-sm-2" id="timeselect">
                                           <option value = "5" selected>Last 5 days</option>
                                           <option value="10">Last 10 days</option>
@@ -122,32 +196,44 @@
                                         </select>
                                       </div>
 
-                                      <div class="col-12 col-sm-12 col-xl-3 my-1">
-                                        <select class="custom-select mr-sm-2" id="typeselect">
-                                          <option value = "confirmed" selected>Confirmed cases</option>
-                                          <option value="active">Active cases</option>
-                                          <option value="deaths">Deaths</option>
-                                          <option value="newconfirmed">New cases per day</option>
-                                          <option value="growthfactor">Growth Factor</option>
-                                        </select>
-                                      </div>
+                                      
                                 </div>
                                 <!-- </form> -->
                               
                           </div>
-                          <div class="col-12 col-sm-12 col-xl-3 float-right my-1">
+                          <div class="col-12 col-sm-12 col-xl-1 float-right">
+                                <div class="p-1" style="visibility: hidden;">
+                                  Plot
+                                </div>
                                 <div class="float-right">
                                       <button type="submit" class="btn btn-primary  " id="plotBtn">Plot</button>
-                                      <button type="submit" class="btn btn-primary  " id="showbtn">show</button>
+                                      <!-- <button type="submit" class="btn btn-primary  " id="showbtn">show</button> -->
                                 </div>
                           </div>
                     </div>
               </div>
             
               <br>
-              <div class="container" id = "chartcntnr" style=" width : 100%; height: 70vh;">
-              <!-- <div class="my-4" id="myChart" style=" width : 100%; height: 70vh;" ></div> -->
+              <div class="container col-12 my-2" id = "chartoverlay" style=" width : 95%; height: 65vh;">
+                
+                <div class="container col-12" id = "chartcntnr" style=" width : 100%; height: 70vh;">
+              
+                </div>
+              </div>
+          <div class="row align-items-center">
+            <div class="slidecontainer col-11 my-2">
+              <input type="range" min="0" max="94" value="94" class="slider" id="myRange">
             </div>
+
+            <div class="col-1 p-1" style="text-align: center;">
+              <!-- <img src = "{% static 'images/playpause.png' %}" id = "playpausebtn" style="width: inherit;height: inherit;" type="submit"> -->
+              <input type="image" src="{% static 'images/playpause.png' %}" id="playpausebtn" style= "width: 40%;height: 40%;" >
+              <!-- <div class="float-right">
+                <button type="submit" class="btn " id="playpausebtn" style="background: url({% static 'images/playpause.png' %}); background-repeat: no-repeat;background-size: inherit;">Plot</button>
+                
+          </div> -->
+            </div>
+          </div>
               <script>
                 var chartResize = async function(){
                   await new Promise(r => setTimeout(r, 50));
@@ -162,7 +248,7 @@
                     $("#chartcntnr").css('height', "150vh");
                   }
                   else{
-                    $("#chartcntnr").css('height', "70vh");
+                    $("#chartcntnr").css('height', "65vh");
                   }
                   
                 };
@@ -173,7 +259,7 @@
 
               <br>
               
-              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
                 <h1 class="h2">Raw Data</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                       <div class="btn-group mr-2">
@@ -186,12 +272,28 @@
               <br>
 
               <!--TABLE-->
-              <div class ="mb-2"id = "rawData"></div>
+              
+              <div class ="mb-2 col-12"id = "rawData">
+              <div class = "my-3" >
+                <h6 id = "table1title"></h6>
+                <div id = "tableyaxis">
 
-              <footer class="pt-4 my-md-5 pt-md-5 border-top ">
+                </div>
+
+              </div>
+
+              <div class = "my-5" >
+                <h6 id = "table2title"></h6>
+                <div id = "tablexaxis"> 
+
+                </div>
+              </div>
+              </div>
+
+              <footer class="pt-4 my-4 my-md-5 pt-md-5 border-top ">
                 <div class="row">
                   <div class="col-12 col-md-12">
-                    <h6 style="text-align: center;">Developed by Harsh Gupta</h6>
+                    <div style="text-align: center;">Developed by Harsh Gupta</div>
                   </div>
                 </div>
                   <div class="row ">
@@ -210,7 +312,8 @@
         </main>
       </div>
     </div>
-    <script type="text/javascript" src="{% static 'js/try.js' %}"></script>
+    <!-- <script type="text/javascript" src="{% static 'js/try.js' %}"></script> -->
+    <script type="text/javascript" src="{% static 'js/allCountries.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/explorer.js' %}"></script>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
