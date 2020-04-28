@@ -21,6 +21,7 @@ def explorer(request):
 def getCountries(request):
     data = pd.read_csv("https://data.humdata.org/hxlproxy/api/data-preview.csv?url=https%3A%2F%2Fraw.githubusercontent.com%2FCSSEGISandData%2FCOVID-19%2Fmaster%2Fcsse_covid_19_data%2Fcsse_covid_19_time_series%2Ftime_series_covid19_confirmed_global.csv&filename=time_series_covid19_confirmed_global.csv")
     group = data.groupby(['Country/Region']).sum()
+    group = group.sort_values(by= group.columns[-1], ascending = False)
     countries = np.array(group.index)
     countries_forJson = countries.tolist()
     return JsonResponse({"countries" : countries_forJson})
@@ -122,11 +123,11 @@ def active(countries, time):
     active_t = active.transpose()
 
     if(time == -1):
-        active_tt = active_t[countries].transpose()
+        active_t = active_t[countries]#.transpose()
     else:
-        active_tt = active_t[countries][-1*time:].transpose()
+        active_t = active_t[countries][-1*time:]#.transpose()
 
-    response = active_tt.to_json(orient='table')
+    response = active_t.to_json(orient='index')
 
     return response
 
@@ -155,11 +156,11 @@ def newConfirmed(countries, time):
     groupDiff_t = groupDiff.transpose()
 
     if(time == -1):
-        groupDiff_tt = groupDiff_t[countries].transpose()
+        groupDiff_t = groupDiff_t[countries]#.transpose()
         #groupDiff_tt = groupDiff_tt.drop(["Lat", "Long"], axis = 1)
     else:
-        groupDiff_tt = groupDiff_t[countries][-1*time:].transpose()
-    response = groupDiff_tt.to_json(orient='table')
+        groupDiff_t = groupDiff_t[countries][-1*time:]#.transpose()
+    response = groupDiff_t.to_json(orient='index')
     
     return response
 

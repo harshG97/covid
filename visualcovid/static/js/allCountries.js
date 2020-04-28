@@ -1,4 +1,8 @@
 var allCountries = JSON.parse(window.sessionStorage.getItem("countries"));
+var countriesSelect =['top10'];
+var page = document.getElementById("page").innerText;
+console.log(page);
+
 console.log( "store",JSON.parse(window.sessionStorage.getItem("countries")));
 
 var multipleCancelButton;
@@ -19,13 +23,15 @@ var intialiseCountryList = function(){
     var option = document.createElement("option");
     option.value = "top10";
     option.text = "Top 10";
-    //option.selected = true;
+    option.selected = true;
     countrySelectList.appendChild(option);
     
-    var option = document.createElement("option");
-    option.value = "all";
-    option.text = "All";
-    countrySelectList.appendChild(option);
+    if(page=="COVID-19 Overview"){
+        var option = document.createElement("option");
+        option.value = "all";
+        option.text = "All";
+        countrySelectList.appendChild(option);
+    }
 
     multipleCancelButton = new Choices('#countrySelect', {
     removeItemButton: true,
@@ -34,7 +40,7 @@ var intialiseCountryList = function(){
     multipleCancelButton.passedElement.element.addEventListener(
     'addItem',
     function(event) {
-        countriesReq.push(event.detail.value);
+        countriesSelect.push(event.detail.value);
     },
     false,
     );
@@ -42,7 +48,7 @@ var intialiseCountryList = function(){
     multipleCancelButton.passedElement.element.addEventListener(
     'removeItem',
     function(event) {
-        countriesReq.splice(countriesReq.indexOf(event.detail.value), 1);
+        countriesSelect.splice(countriesSelect.indexOf(event.detail.value), 1);
     },
     false,
     );
@@ -62,5 +68,6 @@ if(allCountries== null){
 
 }
 else{
+    console.log(allCountries);
     intialiseCountryList();
 }

@@ -1,62 +1,5 @@
-console.log(populationIndexed["India"]);
-console.log(medianAgeIndexed["India"]);
-// var multipleCancelButton;
-// multipleCancelButton = new Choices('#countrySelect', {
-// removeItemButton: true,
-// itemSelectText: '',
-// });
-var countriesReq =['top10'];
 var time = document.getElementById("timeselect").value;
 var plotType = document.getElementById("typeselect").value;
-
-/////////// GET UPDATED LIST OF ALL COUNTRIES ///////////
-// $.getJSON(Urls.countries(), function(result){
-// multipleCancelButton.destroy();
-// console.log("resp", result);
-// var allCountries = result["countries"];
-// console.log(allCountries);
-
-// var countrySelectList = document.getElementById("countrySelect");
-// for(var i =0; i<allCountries.length;++i){
-// var option = document.createElement("option");
-// option.value = allCountries[i];
-// option.text = allCountries[i];
-// countrySelectList.appendChild(option);
-// }
-// var option = document.createElement("option");
-// option.value = "top10";
-// option.text = "Top 10";
-// option.selected = true;
-// countrySelectList.appendChild(option);
-
-// var option = document.createElement("option");
-// option.value = "all";
-// option.text = "All";
-// countrySelectList.appendChild(option);
-
-// multipleCancelButton = new Choices('#countrySelect', {
-// removeItemButton: true,
-// itemSelectText: '',
-// });
-// multipleCancelButton.passedElement.element.addEventListener(
-// 'addItem',
-// function(event) {
-//     countriesReq.push(event.detail.value);
-// },
-// false,
-// );
-
-// multipleCancelButton.passedElement.element.addEventListener(
-// 'removeItem',
-// function(event) {
-//     countriesReq.splice(countriesReq.indexOf(event.detail.value), 1);
-// },
-// false,
-// );
-
-// });
-/////////////////////////////
-
 
 var timeselect = new Choices('#timeselect', {
 removeItemButton: false,
@@ -93,43 +36,91 @@ size : 25,
 minSize : 0,
 maxSize : 25
 });
-$.getJSON(Urls.data(),{'country' : JSON.stringify(countriesReq), 'time' : time, 'plotType' : plotType}, function(result){
+var countriesReq = [];
 
-var resultJson = JSON.parse(result);
-var datasetsList2 = [];
-var chartCategories = [];
-var tableHeaders =[];
-var countriesResp = [];
-console.log(resultJson["data"]);
-for(var i = 0; i<resultJson["data"].length; ++i){
-    var country;
-    var countryDataset = [];
-    var object = resultJson["data"][i];
-
-    for(key in object){
-    if(object.hasOwnProperty(key)){
-        if(key == "Country/Region"){
-            country = object[key];
-            countriesResp.push(country);
-            if(i==0){
-            tableHeaders.push(key);
-            }
-        }
-        else{
-            var dataObj = {};
-            var date = key.split("/");
-            dataObj["date"] = new Date("20"+date[2], date[0]-1, date[1]);
-            dataObj["value"] = object[key];
-            countryDataset.push(dataObj);
-
-            if(i==0){
-            tableHeaders.push(key);
-            }
-        }
-    }
-    }
-    datasetsList2.push(countryDataset);
+if(countriesSelect.includes("all")){
+    countriesReq.push("All");
 }
+if(countriesSelect.includes("top10")){
+    countriesReq.push(...allCountries.slice(0, 10));
+}
+
+for(var i in countriesSelect){
+    if(countriesSelect[i] != "top10" && countriesSelect[i] != "all"){
+        console.log("country", countriesSelect[i]);
+        if(!countriesReq.includes(countriesSelect[i])){
+            countriesReq.push(countriesSelect[i]);
+        }
+    }
+}
+console.log("countriesReq", countriesReq);
+
+var dataToProcess; 
+
+if(plotType == "Confirmed cases"){
+    dataToProcess = allDataConfirmed;
+}
+else if(plotType == " Deaths"){
+    dataToProcess = allDataDeath;
+}
+else if(plotType == "Active cases"){
+    dataToProcess = allDataActive;
+}
+else if(plotType == "New cases/day"){
+    dataToProcess = allDataNew;
+}
+
+console.log("tp process", dataToProcess);
+var keys = Object.keys(dataToProcess);
+if(time != -1){
+    keys = keys.slice(-1*time);
+}
+console.log("keys", keys);
+
+var processesData = [];
+var tableHeaderList = ["Country"];
+var tableDataList = [];
+for(var i =0;i<countriesReq.length;++i){
+    var countryDataList = [];
+    var tableDataObject = {};
+    tableDataObject["Country"] = countriesReq[i];
+    if(countriesReq[i] == "All" && !Object.keys(dataToProcess[keys[0]]).includes("All")){
+        console.log("inhere!!!");
+        
+            for(var j = 0;j<keys.length;++j){
+                var sum = 0;
+                for(var k =0; k<allCountries.length;++k){
+
+                    sum = sum + dataToProcess[keys[j]][allCountries[k]]
+                }
+
+                dataToProcess[keys[j]]["All"] = sum;
+                //console.log(sum);
+
+            }
+        
+    }
+    
+    for(var j =0;j<keys.length;++j){
+        if(i==0){
+            tableHeaderList.push(keys[j]);
+        }
+        tableDataObject[keys[j]] = dataToProcess[keys[j]][countriesReq[i]];
+        var countryDataObject ={};
+        var date = keys[j].split("/");
+        countryDataObject["date"] = new Date("20"+date[2], date[0]-1, date[1]);
+        countryDataObject["value"] = dataToProcess[keys[j]][countriesReq[i]];
+        countryDataList.push(countryDataObject);
+    }
+    
+
+    tableDataList.push(tableDataObject);
+
+    processesData.push(countryDataList);
+}
+console.log("processes", processesData);
+console.log("processes", tableDataList);
+console.log("cnf", allDataConfirmed);
 
 $('#myChart').LoadingOverlay("hide", force = true);
 /////////// CHART ///////////
@@ -140,8 +131,6 @@ var chart = am4core.create("myChart", am4charts.XYChart);
 var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
 dateAxis.renderer.grid.template.location = 0;
 dateAxis.renderer.minGridDistance = 45;
-// dateAxis.startLocation = 0.5;
-//   dateAxis.endLocation = 0.5;
 dateAxis.renderer.minLabelPosition = 0.01;
 dateAxis.renderer.maxLabelPosition = 0.99;
 dateAxis.renderer.labels.template.rotation = 315;
@@ -151,11 +140,11 @@ dateAxis.renderer.labels.template.verticalCenter = "middle";
 var  valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 // valueAxis.title.text = "Cases";
 
-for(var i =0; i<countriesResp.length; ++i){
+for(var i =0; i<countriesReq.length; ++i){
     var series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = "value";
     series.dataFields.dateX = "date";
-    series.name = countriesResp[i];
+    series.name = countriesReq[i];
     series.tooltipText = "{name}: [bold]{valueY}[/]";
     series.strokeWidth = 3;
     series.minBulletDistance = 25;
@@ -163,11 +152,11 @@ for(var i =0; i<countriesResp.length; ++i){
     // bullet.circle.strokeWidth = 2;
     bullet.circle.radius = 4;
     
-    series.data = datasetsList2[i];
+    series.data = processesData[i];
 }
 
 chart.cursor = new am4charts.XYCursor();
-if (countriesResp.length < 20){
+if (countriesReq.length < 20){
     chart.legend = new am4charts.Legend();
 }
 chart.exporting.menu = new am4core.ExportMenu();
@@ -178,12 +167,11 @@ $("#downloadPng").click(function exportPNG() {
 /////////////////////////////
 
 
-/////////// TABLE ///////////
-var dataObject = resultJson["data"];
+// /////////// TABLE ///////////
 var tableElement = document.getElementById("rawData");
 var tableElementContainer = tableElement.parentNode;
 var hotSettings = {
-    data: dataObject,
+    data: tableDataList,
     licenseKey: 'non-commercial-and-evaluation',
     stretchH: 'all',
     width: '100%',
@@ -191,7 +179,7 @@ var hotSettings = {
     height: '50vh',
     //maxRows: 20,
     rowHeaders: true,
-    colHeaders: tableHeaders,
+    colHeaders: tableHeaderList,
     columnSorting: {
     indicator: true
     },
@@ -222,12 +210,12 @@ downloadBtn.addEventListener('click', function() {
 
 /////////////////////////////
 
-});
+// });
 
 }
 /////////////////////////////
 
 /////////// For ploting default chart ///////////
-plotBtnClick();
+//plotBtnClick();
 
 $("#plotBtn").click(plotBtnClick);
