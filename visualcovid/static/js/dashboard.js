@@ -30,13 +30,24 @@ false,
 );
 
 /////////// PLOT BTN ON CLICK ///////////
-var plotBtnClick = function(){
+var plotBtnClick = async function(){
 $('#myChart').LoadingOverlay("show", {
 size : 25,
 minSize : 0,
 maxSize : 25
 });
 var countriesReq = [];
+
+if(!allCountries){
+    console.log("!!!");
+    for(var i =0;;i++){
+        console.log("!");
+        if(allCountries){
+            break;
+        }
+        await new Promise(r => setTimeout(r, 1000));
+    }
+}
 
 if(countriesSelect.includes("all")){
     countriesReq.push("All");
@@ -58,18 +69,45 @@ console.log("countriesReq", countriesReq);
 var dataToProcess; 
 
 if(plotType == "Confirmed cases"){
+    console.log("confirmed");
+
     dataToProcess = allDataConfirmed;
 }
-else if(plotType == " Deaths"){
+else if(plotType == "Deaths"){
+    console.log("deaths");
     dataToProcess = allDataDeath;
 }
 else if(plotType == "Active cases"){
+    console.log("active");
+
     dataToProcess = allDataActive;
 }
 else if(plotType == "New cases/day"){
+    console.log("new");
+    // if(allDataConfirmed==null){
+    //     for(var i =0;;i++){
+    //         console.log("2");
+    //         if(allDataConfirmed != null){
+    //             break;
+    //         }
+    //         await new Promise(r => setTimeout(r, 500));
+    //     }
+    // }
     dataToProcess = allDataNew;
 }
 
+
+
+    if(dataToProcess==null){
+        for(var i =0;;i++){
+            console.log("2");
+            if(dataToProcess != null){
+                break;
+            }
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+    
 console.log("tp process", dataToProcess);
 var keys = Object.keys(dataToProcess);
 if(time != -1){
@@ -148,6 +186,8 @@ for(var i =0; i<countriesReq.length; ++i){
     series.tooltipText = "{name}: [bold]{valueY}[/]";
     series.strokeWidth = 3;
     series.minBulletDistance = 25;
+    series.tensionX = 0.85;
+    series.tensionY = 1;
     var bullet = series.bullets.push(new am4charts.CircleBullet());
     // bullet.circle.strokeWidth = 2;
     bullet.circle.radius = 4;
@@ -216,6 +256,6 @@ downloadBtn.addEventListener('click', function() {
 /////////////////////////////
 
 /////////// For ploting default chart ///////////
-//plotBtnClick();
+plotBtnClick();
 
 $("#plotBtn").click(plotBtnClick);

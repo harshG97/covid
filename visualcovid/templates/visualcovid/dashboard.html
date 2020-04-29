@@ -38,32 +38,53 @@
     <!-- Stylesheet -->
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
 
-    <script type="text/javascript" scr = "{% static 'js/loadData.js' %}"></script>
-      <!-- // var allDataConfirmed;
-      // var allDataDeath;
-      // var allDataActive;
-      // var allDataNew;
-      //   $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
-      //       allDataConfirmed = JSON.parse(result);
-      //       console.log("conf",allDataConfirmed);
-      //   });
+    <script>
+      var allDataConfirmed = JSON.parse(window.sessionStorage.getItem("confirmed"));
+          var allDataDeath = JSON.parse(window.sessionStorage.getItem("deaths"));
+          var allDataNew = JSON.parse(window.sessionStorage.getItem("new"));
+          var allDataActive = JSON.parse(window.sessionStorage.getItem("active"));
 
-      //   $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
-      //       allDataDeath = JSON.parse(result);
-      //       console.log("death", allDataDeath);
-      //   });
-      //   $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
-      //       allDataActive = JSON.parse(result);
-      //       console.log("active", allDataActive);
-      //   });
-      //   $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
-      //       allDataNew = JSON.parse(result);
-      //       console.log("new",allDataNew);
-      //   });
-         -->
+          if(allDataConfirmed== null){
 
-        
-    
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
+                  allDataConfirmed = JSON.parse(result);
+                  console.log("conf",allDataConfirmed);
+                  window.sessionStorage.setItem("confirmed", JSON.stringify(allDataConfirmed));
+              });
+
+          }
+
+          if(allDataDeath== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
+                  allDataDeath = JSON.parse(result);
+                  console.log("death",allDataDeath);
+                  window.sessionStorage.setItem("deaths", JSON.stringify(allDataDeath));
+              });
+
+          }
+
+          if(allDataNew== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
+                  allDataNew = JSON.parse(result);
+                  console.log("new",allDataNew);
+                  window.sessionStorage.setItem("new", JSON.stringify(allDataNew));
+              });
+
+          }
+
+          if(allDataActive== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
+                  allDataActive = JSON.parse(result);
+                  console.log("active",allDataActive);
+                  window.sessionStorage.setItem("active", JSON.stringify(allDataActive));
+              });
+
+          }
+
+    </script>
     
   </head>
 
@@ -236,7 +257,10 @@
                   </div> 
                 
               </footer>
+              <!-- <script type="text/javascript" scr="{% static 'js/fetchData.js' %}"></script> -->
               <script type="text/javascript" src="{% static 'js/allCountries.js' %}"></script>
+              <!-- <script type="text/javascript" scr="{% static 'js/fetchData.js' %}"></script> -->
+              
               <script type="text/javascript" src="{% static 'js/dashboard.js' %}"></script>
 
         </main>

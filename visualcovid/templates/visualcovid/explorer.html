@@ -25,7 +25,7 @@
     <script src="//www.amcharts.com/lib/4/core.js"></script>
     <script src="//www.amcharts.com/lib/4/charts.js"></script>
     <!-- <script src="//www.amcharts.com/lib/4/themes/animated.js"></script> -->
-    <script src="//www.amcharts.com/lib/4/themes/material.js"></script>
+    <!-- <script src="//www.amcharts.com/lib/4/themes/material.js"></script> -->
     <script src="//www.amcharts.com/lib/4/themes/kelly.js"></script>
 
     <!--Table-->
@@ -39,30 +39,51 @@
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
 
     <script>
-      var allDataConfirmed;
-      var allDataDeath;
-      var allDataActive;
-      var allDataNew;
-        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
-            allDataConfirmed = JSON.parse(result);
-            console.log("conf",allDataConfirmed);
-        });
+      var allDataConfirmed = JSON.parse(window.sessionStorage.getItem("confirmed"));
+          var allDataDeath = JSON.parse(window.sessionStorage.getItem("deaths"));
+          var allDataNew = JSON.parse(window.sessionStorage.getItem("new"));
+          var allDataActive = JSON.parse(window.sessionStorage.getItem("active"));
 
-        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
-            allDataDeath = JSON.parse(result);
-            console.log("death", allDataDeath);
-        });
-        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
-            allDataActive = JSON.parse(result);
-            console.log("active", allDataActive);
-        });
-        $.getJSON('{% url "data" %}',{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
-            allDataNew = JSON.parse(result);
-            console.log("new",allDataNew);
-        });
-        
+          if(allDataConfirmed== null){
 
-        
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'confirmed'}, function(result){
+                  allDataConfirmed = JSON.parse(result);
+                  console.log("conf",allDataConfirmed);
+                  window.sessionStorage.setItem("confirmed", JSON.stringify(allDataConfirmed));
+              });
+
+          }
+
+          if(allDataDeath== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'deaths'}, function(result){
+                  allDataDeath = JSON.parse(result);
+                  console.log("death",allDataDeath);
+                  window.sessionStorage.setItem("deaths", JSON.stringify(allDataDeath));
+              });
+
+          }
+
+          if(allDataNew== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'newconfirmed'}, function(result){
+                  allDataNew = JSON.parse(result);
+                  console.log("new",allDataNew);
+                  window.sessionStorage.setItem("new", JSON.stringify(allDataNew));
+              });
+
+          }
+
+          if(allDataActive== null){
+
+              $.getJSON(Urls.data(),{'country' : JSON.stringify(['all']), 'time' : -1, 'plotType' : 'active'}, function(result){
+                  allDataActive = JSON.parse(result);
+                  console.log("active",allDataActive);
+                  window.sessionStorage.setItem("confirmed", JSON.stringify(allDataActive));
+              });
+
+          }
+
     </script>
     
   </head>
@@ -148,13 +169,13 @@
                                           Y-axis
                                         </div>
                                         <select class="custom-select mr-sm-2" id="yaxis">
-                                          <option value = "Confirmed cases" selected>Confirmed cases</option>
+                                          <option value = "Confirmed cases" >Confirmed cases</option>
                                           <option value="Confirmed cases/1000 population">Confirmed cases/1000 population</option>
                                           <option value="Deaths/1000 population">Deaths/1000 population</option>
                                           <option value="Median age">Median age</option>
                                           <option value="Population">population</option>
                                           
-                                          <option value="Death percentage">Death percentage</option>
+                                          <option value="Death percentage" selected>Death percentage</option>
                                           <option value="Active cases">Active cases</option>
                                           <option value="Deaths">Deaths</option>
                                           <option value="New cases/day">New cases/day</option>
@@ -171,7 +192,7 @@
                                           <option value="Confirmed cases/1000 population">Confirmed cases/1000 population</option>
                                           <option value="Deaths/1000 population">Deaths/1000 population</option>
                                           <option value="Median age">Median age</option>
-                                          <option value="population">population</option>
+                                          <option value="Population">Population</option>
                                           
                                           <option value="Death percentage">Death percentage</option>
                                           <option value="Active cases">Active cases</option>
@@ -222,7 +243,7 @@
               </div>
           <div class="row align-items-center">
             <div class="slidecontainer col-11 my-2">
-              <input type="range" min="0" max="94" value="94" class="slider" id="myRange">
+              <input type="range" class="slider" id="myRange">
             </div>
 
             <div class="col-1 p-1" style="text-align: center;">
@@ -312,7 +333,7 @@
         </main>
       </div>
     </div>
-    <!-- <script type="text/javascript" src="{% static 'js/try.js' %}"></script> -->
+    
     <script type="text/javascript" src="{% static 'js/allCountries.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/explorer.js' %}"></script>
     <!-- Icons -->

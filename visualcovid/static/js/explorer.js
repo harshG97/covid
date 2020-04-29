@@ -1,17 +1,24 @@
 console.log(populationIndexed["India"]);
 console.log(medianAgeIndexed["India"]);
 
-var countriesReq =[];
-var time = document.getElementById("timeselect").value;
-var plotType = document.getElementById("yaxis").value;
-var yaxisType = document.getElementById("yaxis").value;
-var xaxisType = document.getElementById("xaxis").value;
-var loadingText = document.getElementById("chartload");
+
+
 var playState;
 var currentChart;
 var m_names = new Array("Jan", "Feb", "Mar", 
 "Apr", "May", "Jun", "Jul", "Aug", "Sept", 
 "Oct", "Nov", "Dec");
+var time = document.getElementById("timeselect").value;
+var yaxisType = document.getElementById("yaxis").value;
+var xaxisType = document.getElementById("xaxis").value;
+var dateList = [];
+var n;
+var maxXaxis = 0;
+var maxYaxis = 0;
+var keys = [];
+var chartList =[];
+var chartInstanceList = [];
+var id = 1;
 
 var timeselect = new Choices('#timeselect', {
   removeItemButton: false,
@@ -37,7 +44,6 @@ yaxis.passedElement.element.addEventListener(
   'addItem',
   function(event) {
     yaxisType = event.detail.value;
-    plotType = event.detail.value;
   },
   false,
 );
@@ -58,16 +64,8 @@ xaxis.passedElement.element.addEventListener(
 );
 
 /////////// PLOT BTN ON CLICK ///////////
-var chartList =[];
-var chartInstanceList = [];
-var dateList = [];
-var n;
-var maxXaxis = 0;
-var maxYaxis = 0;
-var keys = [];
 
-var id = 1;
-var plotBtnClickNew = function(){
+var plotBtnClickNew = async function(){
 
   var chartcontainer = document.getElementById("chartcntnr");
   if(chartcontainer.hasChildNodes()){
@@ -77,6 +75,34 @@ var plotBtnClickNew = function(){
       chartcontainer.removeChild(chartcontainer.childNodes[i]);
     }
   }
+
+  if(!allCountries){
+    console.log("!!!");
+    for(var i =0;;i++){
+        console.log("!");
+        if(allCountries){
+            break;
+        }
+        await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+  var countriesReq =[];
+  if(countriesSelect.includes("all")){
+      countriesReq.push("All");
+  }
+  if(countriesSelect.includes("top10")){
+      countriesReq.push(...allCountries.slice(0, 10));
+  }
+
+  for(var i in countriesSelect){
+      if(countriesSelect[i] != "top10" && countriesSelect[i] != "all"){
+          console.log("country", countriesSelect[i]);
+          if(!countriesReq.includes(countriesSelect[i])){
+              countriesReq.push(countriesSelect[i]);
+          }
+      }
+  }
+  console.log("countriesReq", countriesReq);
 
   
 
@@ -95,6 +121,15 @@ var plotBtnClickNew = function(){
   maxXaxis=0;
   maxYaxis=0;
   if (yaxisType == 'Confirmed cases'){
+    if(allDataConfirmed==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataConfirmed != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     //console.log(Object.keys(allDataConfirmed))
     for(var i =0;i<keys.length;++i){        
       var datainstance = [];
@@ -120,14 +155,23 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (yaxisType == 'Confirmed cases/1000 population'){
+    if(allDataConfirmed==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataConfirmed != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       
       var datainstance = [];
       var date = keys[i].split("/");
       dateList.push(new Date("20"+date[2], date[0]-1, date[1]));
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]]);
-          maxYaxis = maxYaxis > allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]] ? maxYaxis : allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]];
+          datainstance.push(allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxYaxis = maxYaxis > allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxYaxis : allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       yaxisData.push(datainstance);
     }
@@ -145,13 +189,22 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (yaxisType == 'Deaths/1000 population'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       var date = keys[i].split("/");
       dateList.push(new Date("20"+date[2], date[0]-1, date[1]));
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]]);
-          maxYaxis = maxYaxis > allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]] ? maxYaxis : allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]];
+          datainstance.push(allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxYaxis = maxYaxis > allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxYaxis : allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       yaxisData.push(datainstance);
     }
@@ -174,8 +227,8 @@ var plotBtnClickNew = function(){
       var date = keys[i].split("/");
       dateList.push(new Date("20"+date[2], date[0]-1, date[1]));
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(medianAgeIndexed[countriesReq[j]]);
-          maxYaxis = maxYaxis > medianAgeIndexed[countriesReq[j]] ? maxYaxis : medianAgeIndexed[countriesReq[j]];
+          datainstance.push(medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxYaxis = maxYaxis > medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxYaxis : medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       yaxisData.push(datainstance);
     }
@@ -198,8 +251,8 @@ var plotBtnClickNew = function(){
       var date = keys[i].split("/");
       dateList.push(new Date("20"+date[2], date[0]-1, date[1]));
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(populationIndexed[countriesReq[j]] * 1000);
-          maxYaxis = maxYaxis > populationIndexed[countriesReq[j]]*1000 ? maxYaxis : populationIndexed[countriesReq[j]]*1000;
+          datainstance.push(populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] * 1000);
+          maxYaxis = maxYaxis > populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]*1000 ? maxYaxis : populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]*1000;
       }
       yaxisData.push(datainstance);
     }
@@ -229,6 +282,15 @@ var plotBtnClickNew = function(){
     // }
   }
   else if (yaxisType == 'Death percentage'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     console.log("deathPercent!!!!");
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
@@ -238,7 +300,7 @@ var plotBtnClickNew = function(){
           datainstance.push(100*allDataDeath[keys[i]][countriesReq[j]]/allDataConfirmed[keys[i]][countriesReq[j]]);
           // console.log("death", allDataDeath[key][countriesReq[j]]);
           // console.log("conf",allDataConfirmed[key][countriesReq[j]] );
-          // console.log("perc",100*allDataDeath[key][countriesReq[j]]/allDataConfirmed[key][countriesReq[j]] );
+          console.log("perc",100*allDataDeath[keys[i]][countriesReq[j]]/allDataConfirmed[keys[i]][countriesReq[j]] , allDataConfirmed[keys[i]][countriesReq[j]], allDataDeath[keys[i]][countriesReq[j]]);
           maxYaxis = maxYaxis > 100*allDataDeath[keys[i]][countriesReq[j]]/allDataConfirmed[keys[i]][countriesReq[j]] ? maxYaxis : 100*allDataDeath[keys[i]][countriesReq[j]]/allDataConfirmed[keys[i]][countriesReq[j]];
       }
       yaxisData.push(datainstance);
@@ -257,6 +319,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (yaxisType == 'Active cases'){
+    if(allDataActive==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataActive != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       var date = keys[i].split("/");
@@ -281,6 +352,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (yaxisType == 'Deaths'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       var date = keys[i].split("/");
@@ -305,6 +385,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (yaxisType == 'New cases/day'){
+    if(allDataNew==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataNew != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       var date = keys[i].split("/");
@@ -334,6 +423,15 @@ var plotBtnClickNew = function(){
     
 
   if (xaxisType == 'Confirmed cases'){
+    if(allDataConfirmed==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataConfirmed != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
@@ -357,12 +455,21 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'Confirmed cases/1000 population'){
+    if(allDataConfirmed==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataConfirmed != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]]);
-          maxXaxis = maxXaxis > allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]] ? maxXaxis : allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]];
+          datainstance.push(allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxXaxis = maxXaxis > allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxXaxis : allDataConfirmed[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       xaxisData.push(datainstance);
     }
@@ -380,12 +487,21 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'Deaths/1000 population'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]]);
-          maxXaxis = maxXaxis > allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]] ? maxXaxis : allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[countriesReq[j]];
+          datainstance.push(allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxXaxis = maxXaxis > allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxXaxis : allDataDeath[keys[i]][countriesReq[j]]/populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       xaxisData.push(datainstance);
     }
@@ -407,8 +523,8 @@ var plotBtnClickNew = function(){
       var datainstance = [];
       
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(medianAgeIndexed[countriesReq[j]]);
-          maxXaxis = maxXaxis > medianAgeIndexed[countriesReq[j]] ? maxXaxis : medianAgeIndexed[countriesReq[j]];
+          datainstance.push(medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]]);
+          maxXaxis = maxXaxis > medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] ? maxXaxis : medianAgeIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]];
       }
       xaxisData.push(datainstance);
     }
@@ -430,7 +546,7 @@ var plotBtnClickNew = function(){
       var datainstance = [];
       
       for(var j =0 ;j<countriesReq.length;++j){
-          datainstance.push(populationIndexed[countriesReq[j]] * 1000);
+          datainstance.push(populationIndexed[iso3toCountryName[longOrTwoToThree[countriesReq[j]]]] * 1000);
           maxXaxis = maxXaxis > dateList[i] ? maxXaxis : dateList[i];
       }
       xaxisData.push(datainstance);
@@ -473,6 +589,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'Death percentage'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
@@ -496,6 +621,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'Active cases'){
+    if(allDataActive==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataActive != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
@@ -519,6 +653,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'Deaths'){
+    if(allDataDeath==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataDeath != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     console.log("XXXXXX");
     for(var i =0;i<keys.length;++i){
       var datainstanceY = [];
@@ -544,6 +687,15 @@ var plotBtnClickNew = function(){
     tableDataList.push(tableDataRows);
   }
   else if (xaxisType == 'New cases/day'){
+    if(allDataNew==null){
+      for(var i =0;;i++){
+          console.log("2");
+          if(allDataNew != null){
+              break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+      }
+    }
     for(var i =0;i<keys.length;++i){
       var datainstance = [];
       
@@ -595,6 +747,7 @@ var plotBtnClickNew = function(){
 
 
   chartInstanceList = [];
+  chartList=[];
 
   var chartParent = document.createElement("div");
   chartParent.id = "charts";
@@ -654,7 +807,7 @@ var plotBtnClickNew = function(){
       var bullet = series.bullets.push(new am4charts.CircleBullet());
       // bullet.circle.strokeWidth = 2;
       bullet.circle.radius = 10;
-      bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+      bullet.tooltipText = "[bold]{name}[/]\n"+yaxisType+": {valueY}\n"+xaxisType+": {valueX}";
       
       series.data = chartDataList[i][j];
     }
@@ -670,6 +823,7 @@ var plotBtnClickNew = function(){
     
     chartParent.appendChild(chartelement);
     chartInstanceList.push(chartelement);
+    chartList.push(chart);
     
 
     
@@ -679,12 +833,14 @@ var plotBtnClickNew = function(){
   $('#myRange').attr("min",String(0));
   $('#myRange').attr("max",String(keys.length-1));
   $('#myRange').attr("value",String(keys.length-1));
+  
 
   playState = "pause";
   currentChart = keys.length-1;
 
 
   $('#chartoverlay').LoadingOverlay("hide", force = true);
+  
 
   
   
@@ -720,7 +876,7 @@ var plotBtnClickNew = function(){
       exportFile: true
   };
   var hot1 = new Handsontable(tableElement1, hotSettings1);
-  //var downloadBtn = document.getElementById('download');
+  var downloadBtn = document.getElementById('download');
   var exportPlugin1 = hot1.getPlugin('exportFile');
 
 
@@ -749,6 +905,41 @@ var plotBtnClickNew = function(){
   var hot2 = new Handsontable(tableElement2, hotSettings2);
   //var downloadBtn = document.getElementById('download');
   var exportPlugin2 = hot2.getPlugin('exportFile');
+
+  downloadBtn.addEventListener('click', function() {
+    exportPlugin1.downloadFile('csv', {
+    bom: false,
+    columnDelimiter: ',',
+    columnHeaders: true,
+    exportHiddenColumns: true,
+    exportHiddenRows: true,
+    fileExtension: 'csv',
+    filename: "corona_"+yaxisType+"_"+time,
+    mimeType: 'text/csv',
+    rowDelimiter: '\r\n',
+    rowHeaders: true
+    });
+
+    exportPlugin2.downloadFile('csv', {
+      bom: false,
+      columnDelimiter: ',',
+      columnHeaders: true,
+      exportHiddenColumns: true,
+      exportHiddenRows: true,
+      fileExtension: 'csv',
+      filename: "corona_"+xaxisType+"_"+time,
+      mimeType: 'text/csv',
+      rowDelimiter: '\r\n',
+      rowHeaders: true
+      });
+
+
+  });
+
+
+  var slider = document.getElementById("myRange");
+  slider.value = keys.length-1;
+
   
 }
 
@@ -757,13 +948,21 @@ var changeChart = function (value){
   chartInstanceList[currentChart].style.display = "none";
   chartInstanceList[value].style.display = "block";
   currentChart = value;
+  console.log("change", currentChart);
 
 }
 
 var slider = document.getElementById("myRange");
 slider.oninput = function() {
+  console.log("input", this.value);
   changeChart(this.value);
+  
 }
+
+// $('#myRange').attr("value").change  = function() {
+//   console.log("changed!!");
+  
+// }
 
 
 /////////// For ploting default chart ///////////
@@ -777,7 +976,7 @@ var loading = async function(){
     minSize : 0,
     maxSize : 35
   });
-  await new Promise(r => setTimeout(r, 150));
+  await new Promise(r => setTimeout(r, 400));
   plotBtnClickNew();
 
   
@@ -794,7 +993,7 @@ var playChartSlideShow = async function(){
     if (playState == "play"){
       slider.value = i;
       changeChart(i);
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 800));
       
       if(i==keys.length-1){
         playState = "pause";
@@ -806,6 +1005,16 @@ var playChartSlideShow = async function(){
   }
 }
 
+$("#downloadPng").click(function exportPNG() {
+  for(var i =0; i<chartInstanceList.length;++i){
+
+    chartList[i].exporting.filePrefix = "corona_"+yaxisType.replace(/\s+/g, '')+"_"+xaxisType.replace(/\s+/g, '')+"_"+keys[i];
+    chartList[i].exporting.export("png");
+
+  }
+  
+});
+
 $("#playpausebtn").click(function(){
   
   console.log("click");
@@ -816,3 +1025,5 @@ $("#playpausebtn").click(function(){
   }
   
 });
+
+loading();
