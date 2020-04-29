@@ -745,13 +745,13 @@ var plotBtnClickNew = async function () {
       series.strokeWidth = 3;
       series.minBulletDistance = 25;
       var bullet = series.bullets.push(new am4charts.CircleBullet());
-      bullet.circle.radius = 10;
+      bullet.circle.radius = 15;
       bullet.tooltipText = "[bold]{name}[/]\n" + yaxisType + ": {valueY}\n" + xaxisType + ": {valueX}";
       series.data = chartDataList[i][j];
     }
 
     chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
+    //chart.exporting.menu = new am4core.ExportMenu();
 
     if (i == keys.length - 1) {
       chartelement.style.display = "block";

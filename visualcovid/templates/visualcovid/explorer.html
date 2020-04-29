@@ -239,9 +239,9 @@
         </div>
 
         <br>
-        <div class="container col-12 my-2" id="chartoverlay" style=" width : 100%; height: 65vh;">
+        <div class="container col-12 my-2 px-0" id="chartoverlay" style=" width : 100%; height: 65vh;">
 
-          <div class="container col-12" id="chartcntnr" style=" width : 100%; height: 100%;">
+          <div class="container col-12 px-0" id="chartcntnr" style=" width : 100%; height: 100%;">
 
           </div>
         </div>
@@ -253,7 +253,7 @@
           <div class="col-1 p-1" style="text-align: center;">
             <!-- <img src = "{% static 'images/playpause.png' %}" id = "playpausebtn" style="width: inherit;height: inherit;" type="submit"> -->
             <input type="image" src="{% static 'images/playpause.png' %}" id="playpausebtn"
-              style="width: 40%;height: 40%;">
+              style="width: 50%;height: 50%;">
             <!-- <div class="float-right">
                 <button type="submit" class="btn " id="playpausebtn" style="background: url({% static 'images/playpause.png' %}); background-repeat: no-repeat;background-size: inherit;">Plot</button>
                 
@@ -277,9 +277,17 @@
               $("#chartoverlay").css('height', "65vh");
             }
 
+            if(w<600){
+              $("#playpausebtn").attr("style", "width: 90%; height: 90%;");
+            }
+            else{
+              $("#playpausebtn").attr("style", "width: 40%; height: 40%;")
+            }
+
           };
           chartResize();
           window.addEventListener("orientationchange", chartResize);
+
         </script>
 
 
