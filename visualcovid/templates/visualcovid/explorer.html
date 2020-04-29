@@ -239,9 +239,9 @@
         </div>
 
         <br>
-        <div class="container col-12 my-2" id="chartoverlay" style=" width : 95%; height: 65vh;">
+        <div class="container col-12 my-2" id="chartoverlay" style=" width : 100%; height: 65vh;">
 
-          <div class="container col-12" id="chartcntnr" style=" width : 100%; height: 70vh;">
+          <div class="container col-12" id="chartcntnr" style=" width : 100%; height: 100%;">
 
           </div>
         </div>
@@ -271,10 +271,10 @@
 
             if (h < 600) {
               // $("#myChart").css('width', a);
-              $("#chartcntnr").css('height', "150vh");
+              $("#chartoverlay").css('height', "150vh");
             }
             else {
-              $("#chartcntnr").css('height', "65vh");
+              $("#chartoverlay").css('height', "65vh");
             }
 
           };
