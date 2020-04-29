@@ -613,7 +613,7 @@ const longOrTwoToThree = {
     ZW: "ZWE",
     CS: "SCG",
     AN: "ANT",
-  };
+};
 
 //   const isoAlpha3toAlpha2 = {
 //     ABW: "AW",
@@ -870,7 +870,7 @@ const longOrTwoToThree = {
 //     ZWE: "ZW",
 //   };
 
-  const iso3toCountryName = {
+const iso3toCountryName = {
     AFG: "Afghanistan",
     ALB: "Albania",
     DZA: "Algeria",
@@ -1120,5 +1120,5 @@ const longOrTwoToThree = {
     ZMB: "Zambia",
     ZWE: "Zimbabwe",
     ALA: "Åland Islands",
-  };
+};
 
