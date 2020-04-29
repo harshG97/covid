@@ -70,43 +70,69 @@ var dataToProcess;
 
 if(plotType == "Confirmed cases"){
     console.log("confirmed");
-
-    dataToProcess = allDataConfirmed;
-}
-else if(plotType == "Deaths"){
-    console.log("deaths");
-    dataToProcess = allDataDeath;
-}
-else if(plotType == "Active cases"){
-    console.log("active");
-
-    dataToProcess = allDataActive;
-}
-else if(plotType == "New cases/day"){
-    console.log("new");
-    // if(allDataConfirmed==null){
-    //     for(var i =0;;i++){
-    //         console.log("2");
-    //         if(allDataConfirmed != null){
-    //             break;
-    //         }
-    //         await new Promise(r => setTimeout(r, 500));
-    //     }
-    // }
-    dataToProcess = allDataNew;
-}
-
-
-
-    if(dataToProcess==null){
+    if(allDataConfirmed==null){
         for(var i =0;;i++){
-            console.log("2", dataToProcess);
-            if(dataToProcess != null){
+            console.log("2");
+            if(allDataConfirmed != null){
                 break;
             }
             await new Promise(r => setTimeout(r, 500));
         }
     }
+    dataToProcess = allDataConfirmed;
+}
+else if(plotType == "Deaths"){
+    console.log("deaths");
+    if(allDataDeath==null){
+        for(var i =0;;i++){
+            console.log("2");
+            if(allDataDeath != null){
+                break;
+            }
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+    dataToProcess = allDataDeath;
+}
+else if(plotType == "Active cases"){
+    console.log("active");
+    if(allDataActive==null){
+        for(var i =0;;i++){
+            console.log("2");
+            if(allDataActive != null){
+                break;
+            }
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+
+    dataToProcess = allDataActive;
+}
+else if(plotType == "New cases/day"){
+    console.log("new");
+    if(allDataNew==null){
+        for(var i =0;;i++){
+            console.log("2");
+            if(allDataNew != null){
+                break;
+            }
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+    dataToProcess = allDataNew;
+}
+
+
+
+    // if(dataToProcess==null){
+    //     for(var i =0;;i++){
+    //         console.log("2", dataToProcess);
+    //         if(dataToProcess != null){
+    //             break;
+    //         }
+    //         await new Promise(r => setTimeout(r, 500));
+    //     }
+    // }
     
 console.log("tp process", dataToProcess);
 var keys = Object.keys(dataToProcess);
