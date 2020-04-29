@@ -100,7 +100,7 @@ else if(plotType == "New cases/day"){
 
     if(dataToProcess==null){
         for(var i =0;;i++){
-            console.log("2");
+            console.log("2", dataToProcess);
             if(dataToProcess != null){
                 break;
             }
